@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🇺🇸 West Coast Roadtrip — Ottobre 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+:root{
+  --bg:#07101e;--sb:#040c18;--card:#0c1828;--card2:#101f33;
+  --border:#162136;--gold:#f0a030;--cyan:#38bdf8;--green:#34d399;
+  --red:#f87171;--orange:#fb923c;--text:#dde6f5;--muted:#4d6380;
+  --sw:230px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{display:flex;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;}
+
+/* ── SIDEBAR ── */
+#sb{
+  width:var(--sw);flex-shrink:0;
+  background:var(--sb);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:relative;z-index:200;
+}
+.sb-brand{padding:1.4rem 1.2rem 1rem;border-bottom:1px solid var(--border);}
+.sb-flag{font-size:1.8rem;line-height:1;}
+.sb-title{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);line-height:1.15;margin-top:.3rem;}
+.sb-sub{font-size:.65rem;color:var(--muted);margin-top:.2rem;letter-spacing:.06em;text-transform:uppercase;}
+.sb-nav{display:flex;flex-direction:column;padding:.6rem 0;gap:.15rem;}
+.tb{
+  display:flex;align-items:center;gap:.65rem;
+  padding:.65rem 1.2rem;background:transparent;border:none;
+  color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-size:.82rem;font-weight:500;text-align:left;
+  transition:all .15s;position:relative;
+}
+.tb:hover{color:var(--text);background:rgba(255,255,255,.03);}
+.tb.on{color:var(--gold);background:rgba(240,160,48,.07);}
+.tb.on::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);}
+.tb-ic{font-size:1rem;flex-shrink:0;}
+.sb-foot{margin-top:auto;padding:1rem 1.2rem;border-top:1px solid var(--border);font-size:.65rem;color:var(--muted);line-height:1.6;}
+
+/* ── MAIN ── */
+#main{flex:1;position:relative;overflow:hidden;}
+.pg{position:absolute;inset:0;overflow-y:auto;display:none;}
+.pg.on{display:block;}
+#pg-map.on{overflow:hidden;}
+#map-el{width:100%;height:100%;}
+
+/* ── INNER ── */
+.pi{max-width:880px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+.ph{margin-bottom:1.75rem;padding-bottom:1.2rem;border-bottom:1px solid var(--border);}
+.ph-ey{font-size:.63rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.35rem;}
+.ph h1{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;line-height:1.15;}
+.ph p{color:var(--muted);margin-top:.4rem;font-size:.85rem;max-width:520px;}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.2rem;margin-bottom:.85rem;position:relative;overflow:hidden;}
+.ca{position:absolute;left:0;top:0;bottom:0;width:3px;}
+.ca-g{background:var(--gold);}
+.ca-c{background:var(--cyan);}
+.ca-gr{background:var(--green);}
+.ca-r{background:var(--red);}
+.ca-o{background:var(--orange);}
+.ct{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;}
+.cs{font-size:.75rem;color:var(--muted);margin-top:.15rem;}
+
+/* ── BADGES ── */
+.b{display:inline-block;padding:.18rem .55rem;border-radius:999px;font-size:.67rem;font-weight:600;letter-spacing:.03em;white-space:nowrap;}
+.b-d{background:rgba(240,160,48,.14);color:var(--gold);}
+.b-dr{background:rgba(56,189,248,.12);color:var(--cyan);}
+.b-ok{background:rgba(52,211,153,.12);color:var(--green);}
+.b-w{background:rgba(251,146,60,.12);color:var(--orange);}
+.b-r{background:rgba(248,113,113,.12);color:var(--red);}
+
+/* ── TIPS ── */
+.tl{list-style:none;display:flex;flex-direction:column;gap:.5rem;margin-top:.75rem;}
+.tl li{display:flex;gap:.55rem;font-size:.82rem;color:#8fa8c8;line-height:1.65;}
+.tic{flex-shrink:0;font-size:.9rem;margin-top:.1rem;}
+
+/* ── PILLS ── */
+.pills{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.55rem;}
+.pill{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:999px;padding:.18rem .6rem;font-size:.7rem;color:var(--muted);}
+
+/* ── SECTION TITLE ── */
+.stitle{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--gold);margin:1.6rem 0 .7rem;display:flex;align-items:center;gap:.45rem;}
+
+/* ── INFO BOXES ── */
+.ib{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.85rem 1rem;font-size:.82rem;color:#8fa8c8;line-height:1.7;margin-bottom:.7rem;}
+.ib.w{border-left:3px solid var(--orange);background:rgba(251,146,60,.04);}
+.ib.d{border-left:3px solid var(--red);background:rgba(248,113,113,.04);}
+.ib.s{border-left:3px solid var(--green);background:rgba(52,211,153,.04);}
+.ib strong{color:var(--text);}
+.ib ul{list-style:none;margin-top:.5rem;display:flex;flex-direction:column;gap:.25rem;}
+
+/* ── STAT ROW ── */
+.stat-row{display:flex;gap:.7rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.85rem 1.1rem;flex:1;min-width:130px;}
+.sv{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;color:var(--gold);}
+.sl{font-size:.65rem;color:var(--muted);margin-top:.15rem;letter-spacing:.04em;}
+
+/* ── HOTELS ── */
+.htier{display:flex;align-items:flex-start;gap:.75rem;padding:.55rem 0;border-bottom:1px solid var(--border);}
+.htier:last-child{border-bottom:none;}
+.htl{font-size:.63rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;min-width:65px;padding-top:.1rem;}
+.htl.b2{color:var(--green);}
+.htl.m2{color:var(--cyan);}
+.htl.lu{color:var(--gold);}
+.hn{font-size:.85rem;font-weight:600;color:var(--text);}
+.hp{font-size:.74rem;color:var(--muted);margin-top:.1rem;}
+.hnote{font-size:.74rem;color:#4d6380;margin-top:.12rem;font-style:italic;}
+
+/* ── LEAFLET OVERRIDES ── */
+.leaflet-tooltip{background:transparent!important;border:none!important;box-shadow:none!important;padding:0!important;}
+.leaflet-tooltip-top::before,.leaflet-tooltip-bottom::before,.leaflet-tooltip-left::before,.leaflet-tooltip-right::before{display:none!important;}
+.leaflet-popup-content-wrapper{background:#0c1828!important;border:1px solid #162136!important;border-radius:8px!important;color:#dde6f5!important;box-shadow:0 12px 40px rgba(0,0,0,.6)!important;padding:0!important;}
+.leaflet-popup-content{margin:0!important;color:#dde6f5!important;}
+.leaflet-popup-tip{background:#0c1828!important;}
+.leaflet-popup-close-button{color:#4d6380!important;top:6px!important;right:8px!important;}
+.ct-tip{background:#0c1828;border:1px solid #162136;border-radius:10px;padding:.8rem 1rem;max-width:230px;box-shadow:0 10px 40px rgba(0,0,0,.55);}
+.ct-day{font-size:.62rem;font-weight:700;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;}
+.ct-name{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;margin:.2rem 0 .15rem;}
+.ct-temp{font-size:.72rem;color:var(--cyan);}
+.ct-pills{display:flex;flex-wrap:wrap;gap:3px;margin:.4rem 0;}
+.ct-pill{background:rgba(255,255,255,.06);border-radius:4px;padding:1px 5px;font-size:.68rem;color:#4d6380;}
+.ct-sep{border:none;border-top:1px solid #162136;margin:.45rem 0;}
+.ct-drive{font-size:.74rem;color:#6a85a0;}
+.ct-drive strong{color:var(--text);}
+.dpop{padding:.7rem .85rem;font-size:.8rem;color:#8fa8c8;min-width:200px;}
+.dpop strong{color:var(--gold);}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#162136;border-radius:999px;}
+
+/* ── MOBILE ── */
+@media(max-width:700px){
+  body{flex-direction:column;}
+  #sb{width:100%;height:auto;flex-direction:row;align-items:center;border-right:none;border-bottom:1px solid var(--border);}
+  .sb-brand{padding:.6rem 1rem;border-bottom:none;flex-shrink:0;}
+  .sb-title{font-size:.82rem;}
+  .sb-sub{display:none;}
+  .sb-nav{flex-direction:row;padding:0;flex:1;overflow-x:auto;gap:0;}
+  .tb{padding:.75rem .65rem;font-size:.72rem;white-space:nowrap;}
+  .tb.on::before{top:auto;bottom:0;left:0;right:0;height:2px;width:auto;}
+  .sb-foot{display:none;}
+  .stat-row{gap:.5rem;}
+}
+</style>
+</head>
+<body>
+
+<div id="sb">
+  <div class="sb-brand">
+    <div class="sb-flag">🇺🇸</div>
+    <div class="sb-title">West Coast<br>Roadtrip</div>
+    <div class="sb-sub">16 giorni · Ottobre 2026</div>
+  </div>
+  <nav class="sb-nav">
+    <button class="tb on" data-p="map"><span class="tb-ic">📍</span>Mappa</button>
+    <button class="tb" data-p="tappe"><span class="tb-ic">📅</span>Tappe</button>
+    <button class="tb" data-p="gen"><span class="tb-ic">🧭</span>Consigli</button>
+    <button class="tb" data-p="alloggi"><span class="tb-ic">🏨</span>Alloggi</button>
+    <button class="tb" data-p="geo"><span class="tb-ic">🌐</span>Geopolitica</button>
+  </nav>
+  <div class="sb-foot">Partenza MXP · 1 ottobre 2026<br>4 persone · ~€4.500/persona<br>Itinerario ottimizzato 2026</div>
+</div>
+
+<main id="main">
+  <div class="pg on" id="pg-map"><div id="map-el"></div></div>
+  <div class="pg" id="pg-tappe"><div class="pi"><div class="ph"><div class="ph-ey">Itinerario ottimizzato · 16 giorni</div><h1>Tappe & Consigli</h1><p>Consigli pratici tappa per tappa, dall'atterraggio a LAX al volo di ritorno da SFO.</p></div><div id="tappe-out"></div></div></div>
+  <div class="pg" id="pg-gen"><div class="pi"><div class="ph"><div class="ph-ey">Logistica & Pratiche</div><h1>Consigli Generali</h1><p>Da ESTA al noleggio auto, dai pedaggi al carburante, dai parchi nazionali alle regole della strada.</p></div><div id="gen-out"></div></div></div>
+  <div class="pg" id="pg-alloggi"><div class="pi"><div class="ph"><div class="ph-ey">Dove dormire</div><h1>Alloggi & Hotel</h1><p>Selezione per ogni tappa: budget, mid-range e un upgrade quando lo merita il luogo. Prezzi per camera/notte in ottobre.</p></div><div id="alloggi-out"></div></div></div>
+  <div class="pg" id="pg-geo"><div class="pi"><div class="ph"><div class="ph-ey">Situazione attuale · Aprile 2026</div><h1>Geopolitica & Sicurezza</h1><p>Analisi aggiornata: crisi del cherosene, nuove norme ESTA, dazi USA-UE, tassa parchi e sicurezza sul percorso.</p></div><div id="geo-out"></div></div></div>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+window.addEventListener('load', function() {
+// ═══════════════════════════════
+// DATA
+// ═══════════════════════════════
+const stops = [
+  { n:1, day:'Giorni 1–2', title:'Los Angeles', coords:[34.0522,-118.2437], temp:'24–28°C, soleggiato',
+    driveFrom:null, driveNet:null, driveReal:null, driveKm:null,
+    hi:['Beverly Hills','Hollywood Walk of Fame','Griffith Obs.','Santa Monica','Venice Beach'],
+    tips:[
+      {i:'🚗',t:'Ritira l\'auto a LAX ma non usarla i primi 2 giorni in città: Uber e Lyft sono molto più pratici nel traffico di LA, uno dei peggiori degli USA.'},
+      {i:'⏰',t:'Evita l\'auto tra le 7-9 AM e 16-19 PM. Il traffico in queste fasce può triplicare i tempi di percorrenza anche su brevi distanze.'},
+      {i:'🔭',t:'Griffith Observatory la sera: ingresso gratuito, vista iconica sulla città illuminata. Arriva con anticipo, il parcheggio si esaurisce.'},
+      {i:'🌮',t:'Grand Central Market a Downtown LA: pranzo economico e ottimo (budget ~$15/persona). Zona vivace, sicura di giorno.'},
+      {i:'🅿️',t:'Non lasciare MAI nulla di visibile in auto a LA — i furti con rottura del vetro sono frequentissimi. Anche una borsa vuota può bastare.'},
+      {i:'🌅',t:'Santa Monica al tramonto e Venice Beach di mattina: due facce della California classica, a 20 minuti dal centro. Ideale il secondo giorno dopo il jet lag.'},
+    ],
+    hotel:{
+      bud:{n:'Freehand Los Angeles', p:'$120–165/notte', note:'Silver Lake, design hostel con camere private, bar sul rooftop. Vivace e ben posizionato.'},
+      mid:{n:'The LINE Hotel Koreatown', p:'$180–250/notte', note:'Ottimo rapporto qualità-prezzo, piscina sul tetto, ristoranti ottimi. Il mid-range più interessante di LA.'},
+      lux:{n:'Le Parc Suite Hotel', p:'$260–370/notte', note:'West Hollywood, tutto suite, campi da tennis sul roof, 5 min da Sunset Strip. L\'originale del primo itinerario.'},
+    }
+  },
+  { n:2, day:'Giorno 3', title:'San Diego', coords:[32.7157,-117.1611], temp:'22–26°C, ideale',
+    driveFrom:'Los Angeles', driveNet:'2h 15m', driveReal:'4–5h', driveKm:'~200 km',
+    hi:['Balboa Park','Little Italy','Old Town','Coronado Bridge','La Jolla Cove'],
+    tips:[
+      {i:'🦭',t:'La Jolla Cove: leoni marini sulle rocce sotto lo Scripps Park. Gratuito, spettacolare, 15 minuti fuori dall\'autostrada. Non saltarlo lungo la PCH.'},
+      {i:'🌉',t:'Coronado Bridge: guidala tutta per la vista sul porto di San Diego. Il Coronado Island è ottimo per una passeggiata mattutina.'},
+      {i:'🎨',t:'Balboa Park ha 17 musei. Con un solo giorno scegli il San Diego Museum of Art o il Natural History Museum. Il parco stesso è bellissimo.'},
+      {i:'🍺',t:'Little Italy è il quartiere migliore per la cena: Herb & Wood per alta cucina californiana, Ironside per fish & chips, Born & Raised per bistecca.'},
+      {i:'⚓',t:'USS Midway Museum (portaerei storica, $27/pp, 2-3h): ottimo se il gruppo apprezza la storia militare. Nel porto, non devi allontanarti.'},
+    ],
+    hotel:{
+      bud:{n:'The Sofia Hotel', p:'$150–195/notte', note:'Downtown SD, storico boutique hotel, posizione centrale ideale. Il miglior rapporto Q/P della zona.'},
+      mid:{n:'The Guild Hotel', p:'$185–255/notte', note:'Edificio storico del 1926 restaurato, design sofisticato, Downtown SD. L\'originale dell\'itinerario.'},
+      lux:{n:'Hotel del Coronado', p:'$380–650/notte', note:'Icona vittoriana sull\'isola di Coronado dal 1888. L\'esperienza più storica del Sud California.'},
+    }
+  },
+  { n:3, day:'Giorno 4', title:'Palm Springs', coords:[33.8303,-116.5453], temp:'32–37°C, caldo secco',
+    driveFrom:'San Diego', driveNet:'2h', driveReal:'2h 30m–3h', driveKm:'~190 km',
+    hi:['Palm Springs Aerial Tramway','Pioneertown','Desert Hot Springs','Coachella Valley'],
+    tips:[
+      {i:'🚡',t:'La Palm Springs Aerial Tramway porta a 2.600m in 10 minuti: lassù fa 15-20°C in meno. Ideale nel tardo pomeriggio dopo la guida da San Diego.'},
+      {i:'🌡️',t:'In ottobre Palm Springs tocca i 32-37°C. Attività outdoor solo nelle prime ore del mattino o dopo le 17. Pomeriggio: piscina o shopping in Cahuilla Street.'},
+      {i:'🎸',t:'Pioneertown (40 min da Palm Springs): old west autentico ancora oggi. Pappy & Harriet\'s Pioneertown Palace è un bar/ristorante leggendario con live music.'},
+      {i:'🏨',t:'Consiglio: pernotta a Twentynine Palms (40 min est di Joshua Tree) invece che a Palm Springs, così domani entri nel parco già al mattino presto.'},
+      {i:'💧',t:'Inizia qui a portare 2-3 litri d\'acqua per persona in macchina. Abitudine fondamentale per tutto il resto del percorso nel deserto.'},
+    ],
+    hotel:{
+      bud:{n:'Arrive Palm Springs', p:'$130–185/notte', note:'Design hotel moderno con piscina, posizione centrale nel cuore di Palm Springs. Il più trendy del budget.'},
+      mid:{n:'Sparrows Lodge', p:'$200–280/notte', note:'Boutique barn-style, piscina, colazione inclusa, atmosfera romantica. Il preferito dei viaggiatori adulti.'},
+      lux:{n:'Parker Palm Springs', p:'$380–560/notte', note:'L\'ex estate di Gene Autry riconvertita: 13 acri di giardini, 3 piscine, spa, design Jonathan Adler.'},
+    }
+  },
+  { n:4, day:'Giorno 5', title:'Joshua Tree → Needles', coords:[34.8481,-114.6140], temp:'25–33°C',
+    driveFrom:'Palm Springs / Twentynine Palms', driveNet:'3h', driveReal:'5–6h', driveKm:'~270 km',
+    hi:['Joshua Tree NP','Skull Rock','Barker Dam','Pioneertown','Roy\'s Motel (Rt 66)'],
+    tips:[
+      {i:'🌅',t:'Entra da Twentynine Palms alle 7 AM: la luce bassa sui Joshua Trees nelle prime 2 ore è fotograficamente perfetta. Meno gente, più silenzio.'},
+      {i:'🥾',t:'Trail consigliati: Skull Rock (2.7 km, facile, formazioni rocciose uniche), Barker Dam Loop (2.4 km, petroglifi nativi), Ryan Mountain (5 km, panorama 360°).'},
+      {i:'⛽',t:'Fai il pieno a Twentynine Palms prima di uscire dal parco. A Needles le stazioni esistono ma i prezzi sono alti. Porta acqua extra in macchina.'},
+      {i:'🛤️',t:'Roy\'s Motel & Café ad Amboy sulla Route 66: icona desertica, 10 minuti fuori rotta, imperdibile per le foto. La stazione di servizio anni \'50 è ancora in piedi.'},
+      {i:'🌙',t:'Joshua Tree è International Dark Sky Park: se puoi fermarti fino al tramonto, il cielo notturno è tra i più belli degli USA. Porta una coperta per sederti fuori.'},
+      {i:'💳',t:'Il Non-Resident Annual Pass ($250) copre Joshua Tree ($35/veicolo ordinario). Acquistalo su store.usgs.gov prima di partire — risparmio totale >$1.350 sull\'intero trip.'},
+    ],
+    hotel:{
+      bud:{n:'Holiday Inn Express Needles', p:'$90–130/notte', note:'Needles ha poche opzioni. Questo è il più affidabile: pulito, funzionale, piscina. Solo per una notte di transito.'},
+      mid:{n:'Twentynine Palms Inn', p:'$145–210/notte', note:'Meglio dormire qui invece che a Needles: cottages storici nel deserto, oasi con piscina, ristorante con prodotti dell\'orto.'},
+      lux:{n:'The Palms Hotel', p:'$195–280/notte', note:'Desert Hot Springs, spa termale naturale. Alternativa lussuosa vicino a Palm Springs se non vuoi fermarti a Needles.'},
+    }
+  },
+  { n:5, day:'Giorno 6', title:'Grand Canyon', coords:[36.0544,-112.1401], temp:'12–22°C, fresco la sera',
+    driveFrom:'Needles', driveNet:'3h 30m', driveReal:'5–6h', driveKm:'~290 km',
+    hi:['South Rim','Oatman (asini selvatici)','Mather Point','Bright Angel Trail','Desert View Drive'],
+    tips:[
+      {i:'🐴',t:'Oatman sulla Route 66 ha asini selvatici che passeggiano per le strade. Fermati 30-45 minuti: è un\'esperienza unica e gratuita. Carote e mele sono benvenute.'},
+      {i:'🌅',t:'Calcola l\'arrivo al South Rim per le 17:00-17:30 e vai dritto a Mather Point o Yavapai Point per il tramonto. La prima vista del Grand Canyon al tramonto è indimenticabile.'},
+      {i:'🥾',t:'Bright Angel Trail: scendi solo 1-2 ore (fino a 1.5 Mile Resthouse), poi torna su. In ottobre la salita è fattibile ma impegnativa. Porta acqua: l\'asciugatura è rapidissima.'},
+      {i:'🚌',t:'Il sistema di shuttle gratuito del parco copre tutto il South Rim ogni 15 minuti. Lascia la macchina al Visitor Center e usa gli shuttle — parcheggio molto limitato.'},
+      {i:'🌡️',t:'In ottobre il South Rim è a 2.100m: temperature miti di giorno ma fredde la sera (5-10°C). Porta un layer pesante. Il fondo del canyon fa 15-20°C in più.'},
+    ],
+    hotel:{
+      bud:{n:'Yavapai Lodge', p:'$165–220/notte', note:'Dentro il parco, vicino al Visitor Center. Prenota su recreation.gov con 6-12 mesi di anticipo — si esaurisce mesi prima.'},
+      mid:{n:'Maswik Lodge', p:'$185–255/notte', note:'Dentro il parco, cabine confortevoli e ristorante. Atmosfera da ranger station. Stessa piattaforma di prenotazione.'},
+      lux:{n:'El Tovar Hotel', p:'$330–540/notte', note:'L\'hotel storico sul bordo del canyon dal 1905. Prenota 13 mesi prima. L\'esperienza più iconica d\'America.'},
+    }
+  },
+  { n:6, day:'Giorno 7', title:'Page & Horseshoe Bend', coords:[36.9147,-111.4558], temp:'15–25°C, ideale',
+    driveFrom:'Grand Canyon', driveNet:'2h 30m', driveReal:'4h', driveKm:'~195 km',
+    hi:['Horseshoe Bend','Antelope Canyon (Upper/Lower)','Lake Powell','Navajo Bridge','Vermilion Cliffs'],
+    tips:[
+      {i:'⏰',t:'Visita mattutina al Grand Canyon (alba o 8-9 AM), poi parti verso Page. Horseshoe Bend: meglio prima delle 10 o dopo le 15 — la luce diretta a metà giornata è piatta.'},
+      {i:'🥾',t:'Horseshoe Bend: 2.5 km andata/ritorno su terreno sabbioso. Porta cappello, acqua e scarpe chiuse. Nessuna protezione sul bordo — attenzione vertiginosi e bambini.'},
+      {i:'⚠️',t:'FUSO ORARIO: In ottobre (prima del 1° novembre) la Nazione Navajo (Page, Antelope Canyon) è allineata con Utah (UTC-6), non con il resto dell\'Arizona (UTC-7). Il telefono GPS corregge automaticamente.'},
+      {i:'🏜️',t:'Antelope Canyon: prenota un tour Navajo in anticipo. Il Lower Antelope Canyon (Ken\'s Tours, navajotours.com) è meno affollato e con le stesse luci beam dell\'Upper.'},
+      {i:'🚤',t:'Lake Powell: noleggio kayak o giro in barca da Wahweap Marina. Un\'ora sul lago offre una prospettiva completamente diversa sulle pareti di arenaria rossa.'},
+    ],
+    hotel:{
+      bud:{n:'Quality Inn Page–Lake Powell', p:'$100–148/notte', note:'Funzionale, piscina, colazione inclusa. Buon punto di partenza per Horseshoe Bend mattutino.'},
+      mid:{n:'Courtyard by Marriott Page', p:'$155–215/notte', note:'Il miglior hotel mid-range della zona, piscina all\'aperto, bar e ristorante. Standard affidabili Marriott.'},
+      lux:{n:'Hyatt Place Page/Lake Powell', p:'$205–275/notte', note:'Vista Lake Powell da alcune camere, standard superiori rispetto alla media della zona.'},
+    }
+  },
+  { n:7, day:'Giorno 8', title:'Antelope Canyon → Monument Valley → Moab', coords:[38.5733,-109.5498], temp:'10–22°C, ottimale',
+    driveFrom:'Page', driveNet:'3h 45m', driveReal:'6–7h', driveKm:'~350 km',
+    hi:['Lower Antelope Canyon','Monument Valley (US-163)','Mexican Hat Rock','Moab'],
+    tips:[
+      {i:'🏜️',t:'Lower Antelope Canyon la mattina presto (8-9 AM): i beam di luce scendono meglio nei mesi estivi, ma in ottobre l\'effetto è comunque straordinario. Prenota Navajo-guide tours.'},
+      {i:'🚗',t:'Monument Valley Drive (27 km sterrato, $20/veicolo): percorribile con SUV in 2-3h se asciutto. Altrimenti la US-163 panoramica offre già viste mozzafiato — gratuitamente.'},
+      {i:'⛽',t:'Fai il pieno a Mexican Hat (Utah) prima di Monument Valley. Le stazioni all\'interno della Nazione Navajo sono rare e care. Non rischiare.'},
+      {i:'🌙',t:'Arriva a Moab per la cena, riposati. Giornata intensa: Antelope Canyon, Monument Valley e 350 km. The Desert Bistro o Eddie McStiff\'s per la prima serata.'},
+      {i:'⚠️',t:'FUSO ORARIO: Monument Valley (Nazione Navajo, MDT in estate) vs. Arizona (MST). In ottobre, prima del 1° novembre, entrambe a UTC-6 come lo Utah. Il GPS ti segue automaticamente.'},
+    ],
+    hotel:{
+      bud:{n:'Hyatt Place Moab', p:'$170–225/notte', note:'Ottimo rapporto qualità-prezzo a Moab, piscina, colazione, vicino al centro e ai trail.'},
+      mid:{n:'Hoodoo Moab, Curio Collection by Hilton', p:'$240–350/notte', note:'Il miglior hotel tradizionale di Moab: piscina, spa, ristorante eccellente con viste sul canyon.'},
+      lux:{n:'Moab Under Canvas', p:'$280–420/notte', note:'Glamping di lusso nel deserto Utah. Tende climatizzate con bagno privato, falò, cielo stellato. Esperienza unica.'},
+    }
+  },
+  { n:8, day:'Giorno 9', title:'Arches NP → Red Canyon → Bryce', coords:[37.6440,-112.1693], temp:'8–18°C, fresco',
+    driveFrom:'Moab', driveNet:'4h', driveReal:'6–7h', driveKm:'~385 km',
+    hi:['Arches NP (alba)','Delicate Arch','Red Canyon','Bryce Canyon NP','Hoodoos'],
+    tips:[
+      {i:'🌅',t:'Arches all\'alba (7-9 AM): la luce radente sugli archi e gli hoodoos è incomparabile. Parcheggio al Visitor Center alle 6:45, poi camminata a Delicate Arch (4.8 km, 2h).'},
+      {i:'✅',t:'Buona notizia 2026: Arches NP ha rimosso la prenotazione temporizzata obbligatoria. Niente lotteria — arrivi e entri. Verifica su recreation.gov prima di partire.'},
+      {i:'🌲',t:'Red Canyon (sulla UT-12 prima di Bryce): mini-hoodoos rosso vivo attraverso cui passa la strada stessa. Fermati 20 minuti — gratuito e incredibilmente fotogenico.'},
+      {i:'🌡️',t:'Bryce Canyon è a 2.700m di altitudine: in ottobre le temperature scendono a 0-5°C di notte e 10-18°C di giorno. Porta una giacca pesante e strati termici.'},
+      {i:'👁️',t:'Navajo Loop Trail a Bryce (2.2 km, moderate): scende tra Wall Street — un canyon stretto con pini cresciuti tra gli hoodoos. Fallo al tramonto per la luce arancione.'},
+    ],
+    hotel:{
+      bud:{n:'Best Western Plus Bryce Canyon Grand Hotel', p:'$150–200/notte', note:'La scelta budget più affidabile della zona, comoda per l\'ingresso del parco. Colazione inclusa.'},
+      mid:{n:'Bryce Canyon Lodge', p:'$225–300/notte', note:'DENTRO il parco. Log cabin storici, atmosfera unica. Prenota 6-12 mesi prima su recreation.gov.'},
+      lux:{n:'Grand Staircase Inn & Cabins', p:'$200–290/notte', note:'Fuori dal parco ma con accesso rapido. Cabine curate, viste sulle formazioni rocciose, molto tranquillo.'},
+    }
+  },
+  { n:9, day:'Giorno 10', title:'Bryce Canyon → Zion', coords:[37.2982,-113.0263], temp:'16–24°C, perfetto',
+    driveFrom:'Bryce Canyon', driveNet:'1h 30m', driveReal:'2h 30m', driveKm:'~140 km',
+    hi:['Zion Canyon','Angels Landing','The Narrows','Emerald Pools','Zion-Mt Carmel Hwy'],
+    tips:[
+      {i:'🛣️',t:'Arriva a Zion da est via UT-9 (Zion-Mt Carmel Highway): gallerie nella roccia rossa, tornanti con viste verticali sul canyon. Una delle strade più spettacolari degli USA.'},
+      {i:'🚌',t:'Nella Zion Canyon Scenic Drive le auto private non circolano in stagione turistica. Usa gli shuttle gratuiti del parco (7 min di frequenza dal Visitor Center).'},
+      {i:'🪨',t:'Angels Landing (5.4 km, catene di ferro nell\'ultimo tratto): RICHIEDE prenotazione tramite lotteria su recreation.gov. Falla subito per ottobre — scade mesi prima.'},
+      {i:'💧',t:'The Narrows (wading nel Virgin River tra pareti di 300m): ottobre è ottimo per i colori. Acqua fredda (10-12°C). Noleggia scarpe da wading e bastoni a Springdale ($20-25).'},
+      {i:'🌄',t:'Canyon Overlook Trail (2.2 km, facile): vista sulla Zion-Mt Carmel Highway dalle pareti. Fattibile all\'alba senza folla e senza prenotazione — il trail più sottovalutato del parco.'},
+    ],
+    hotel:{
+      bud:{n:'Cliffrose Springdale, Curio Collection', p:'$200–285/notte', note:'Sul Virgin River, giardini curati, a 50m dall\'ingresso del parco. Il budget-mid più apprezzato della zona.'},
+      mid:{n:'Zion Lodge', p:'$255–390/notte', note:'L\'UNICO hotel dentro il parco. Prenotazione 6-13 mesi prima obbligatoria. Svegliati con le pareti del canyon fuori dalla finestra.'},
+      lux:{n:'Under Canvas Zion', p:'$320–520/notte', note:'Glamping premium fuori dal parco. Safari tents con bagno privato, falò, cielo stellato. Il posto più fotografato dell\'itinerario.'},
+    }
+  },
+  { n:10, day:'Giorni 11–12', title:'Las Vegas', coords:[36.1699,-115.1398], temp:'22–29°C, piacevole',
+    driveFrom:'Zion', driveNet:'2h 15m', driveReal:'4h', driveKm:'~245 km',
+    hi:['Valley of Fire SP','The Strip by night','Fremont Street','High Roller','Sphere'],
+    tips:[
+      {i:'🔥',t:'Valley of Fire State Park (55 min da Zion, sulla strada per Vegas): arenaria rossa infuocata, petroglifi nativi, formazioni spaziali. Visita nel primo giorno, mattino presto.'},
+      {i:'🚖',t:'Sulla Strip usa SEMPRE Uber/Lyft. Il traffico automobilistico è paralizzato nelle ore serali — anche un tragitto di 500m può richiedere 30 minuti in macchina.'},
+      {i:'🎡',t:'High Roller (ruota panoramica, $25-30) di sera per le luci della città. La Sphere è uno show unico al mondo — prenota in anticipo su thespherevegas.com ($99-299).'},
+      {i:'🌃',t:'Fremont Street Experience (centro storico, gratuita): canopy LED da 500m, live music, street food autentico. Più interessante della Strip per chi non è un giocatore d\'azzardo.'},
+      {i:'🏨',t:'Le resort fee non sono incluse nelle tariffe pubblicate: possono aggiungere $35-55/notte. Prenota su Priceline o MGM Resorts Official per tariffe resort fee comprese.'},
+      {i:'💡',t:'2 notti sono sufficienti per Las Vegas. Con la terza notte (se vuoi tenerla) dedica il giorno al Red Rock Canyon National Conservation Area — a 30 minuti dalla Strip, gratuito.'},
+    ],
+    hotel:{
+      bud:{n:'The LINQ Hotel + Experience', p:'$80–145/notte', note:'Centro Strip, moderno, accesso diretto al High Roller e al Linq Promenade. Il budget più comodo.'},
+      mid:{n:'Conrad Las Vegas at Resorts World', p:'$185–330/notte', note:'Il complesso più moderno della Strip (2021). 3 piscine, ristoranti di Nobu e Carversteak, posizione nord-Strip.'},
+      lux:{n:'Wynn Las Vegas', p:'$310–620/notte', note:'Il luxury hotel più apprezzato della Strip. Giardini interni, piscina privata, lake & fountain show, servizio impeccabile.'},
+    }
+  },
+  { n:11, day:'Giorno 13', title:'Death Valley → Mammoth Lakes', coords:[37.6485,-118.9721], temp:'DV: 30-35°C / Mammoth: 5-15°C',
+    driveFrom:'Las Vegas', driveNet:'5h', driveReal:'6–7h', driveKm:'~480 km',
+    hi:['Zabriskie Point','Badwater Basin (−86m)','Mesquite Flat Sand Dunes','Artist\'s Drive','Mammoth Mountain'],
+    tips:[
+      {i:'☀️',t:'Partenza da Vegas alle 8-9 AM. Zabriskie Point (mattino, circa 10 AM) per i colori dorati sulle colline erose. Poi Badwater Basin (punto più basso USA, -86m), Mesquite Dunes, Artist\'s Drive.'},
+      {i:'🌡️',t:'Death Valley in ottobre: ancora caldo (30-35°C). Non spegnere MAI il climatizzatore. Porta minimo 3 litri d\'acqua per persona. Non aprire il cofano se l\'auto surriscalda — lascia raffreddare.'},
+      {i:'⛽',t:'Furnace Creek è l\'UNICO benzinaio nella Death Valley. Fai il pieno anche se non sei a secco — il prossimo è a 75 km fuori dal parco. I prezzi sono alti ma non hai alternative.'},
+      {i:'🏔️',t:'Il passaggio verso Mammoth (CA-136 poi US-395 nord) è scenograficamente bellissimo: dalla Death Valley alla Sierra Nevada in pochi chilometri. Guida panoramica nella luce del pomeriggio.'},
+      {i:'❄️',t:'Mammoth Lakes è a 2.400m. In ottobre le notti scendono a 0-5°C e ci possono essere le prime nevicate in quota. Porta strati pesanti, guanti e scarpe invernali.'},
+    ],
+    hotel:{
+      bud:{n:'The Village Lodge Mammoth', p:'$160–215/notte', note:'Ottima posizione nel Village at Mammoth, accesso shuttle agli impianti, cucina in camera.'},
+      mid:{n:'Mammoth Mountain Inn', p:'$190–275/notte', note:'Direttamente alla base della montagna. Hot tub, possibile ski-in/ski-out se ci sono le prime nevi di ottobre.'},
+      lux:{n:'Westin Monache Resort Mammoth', p:'$275–395/notte', note:'Il miglior hotel di Mammoth: fireplace in ogni camera, shuttle gratuito, spa, ristorante eccellente.'},
+    }
+  },
+  { n:12, day:'Giorno 14', title:'Yosemite NP → Merced', coords:[37.7456,-119.5336], temp:'10–18°C, colori autunnali',
+    driveFrom:'Mammoth Lakes', driveNet:'4h', driveReal:'6–7h', driveKm:'~265 km',
+    hi:['Tioga Pass (3.031m)','Tuolumne Meadows','El Capitan','Half Dome','Bridalveil Fall','Valley View'],
+    tips:[
+      {i:'🏔️',t:'Tioga Pass (CA-120 est): la strada aperta più alta della California (3.031m). VERIFICA che sia aperta su nps.gov — chiude con le prime nevicate, tipicamente da novembre ma a volte prima.'},
+      {i:'🌿',t:'Tuolumne Meadows: prati alpini a 2.600m con cervi e marmotte in ottobre. Una passeggiata mattutina di 30 minuti qui, prima della discesa in Valley, vale i 20 km extra.'},
+      {i:'🧗',t:'Valley View (Bridalveil Fall): la fermata più fotogenica della Valley (El Capitan e Half Dome che si riflettono nel Merced River). 10 minuti di camminata facile.'},
+      {i:'✅',t:'Ottima notizia 2026: Yosemite ha rimosso la prenotazione temporizzata obbligatoria per i veicoli. Niente lotteria. Arriva prima delle 9 AM per il parcheggio.'},
+      {i:'🍂',t:'Ottobre è il momento migliore per Yosemite: foliage autunnale spettacolare, folla ridotta rispetto all\'estate, luce pomeridiana dorata sulle pareti granitiche. Le cascate sono ridotte ma i panorami sono sontuosi.'},
+    ],
+    hotel:{
+      bud:{n:'Hampton Inn & Suites Merced', p:'$115–155/notte', note:'Merced, 90 min da Yosemite Valley. Economico, colazione inclusa. Ottima base per la tappa a SF il giorno dopo.'},
+      mid:{n:'Holiday Inn Express Merced', p:'$110–150/notte', note:'Stesso formato, buon rapporto qualità-prezzo. Merced è solo una tappa di transito — non vale spendere di più.'},
+      lux:{n:'The Ahwahnee (Yosemite Valley)', p:'$500–950/notte', note:'L\'hotel più iconico degli USA, nel cuore della Valley. Prenota con 12+ mesi di anticipo. Un sogno da vivere almeno una notte.'},
+    }
+  },
+  { n:13, day:'Giorni 15–16', title:'San Francisco', coords:[37.7749,-122.4194], temp:'14–19°C, nebbia mattutina',
+    driveFrom:'Merced', driveNet:'1h 45m', driveReal:'2h 30m', driveKm:'~185 km',
+    hi:['Golden Gate Bridge','Alcatraz','Fisherman\'s Wharf','Painted Ladies','Mission District','Chinatown'],
+    tips:[
+      {i:'🚢',t:'Alcatraz: PRENOTA MESI PRIMA su alcatrazcruises.com. I tour (giorno e serale) si esauriscono con 2-3 mesi di anticipo. Costo ~$45/pp. Il tour serale vale il sovrapprezzo.'},
+      {i:'🌉',t:'Golden Gate Bridge: cammina la lunghezza completa (4 km a/r, ~1h). La nebbia mattutina che avvolge le torri è l\'immagine iconica di SF — arriva prima delle 9 AM per vederla.'},
+      {i:'🚗',t:'Non guidare in centro SF. Parcheggio rarissimo e costosissimo ($50-80/giorno). Riconsegna l\'auto all\'aeroporto SFO il primo giorno e usa BART (metro, $2.50/corsa) o Uber.'},
+      {i:'🚌',t:'Cable car Powell-Mason: fila lunghissima alle fermate principali. Prendila nelle prime ore del mattino (7-8 AM) o dopo le 21 per evitare attese di 45-60 minuti ($8/corsa).'},
+      {i:'🌮',t:'Mission District: La Taqueria (Mission Burrito) è un\'istituzione californiana. Dolores Park per un pomeriggio pigro con vista sulla città — il rito dei locals.'},
+      {i:'⚠️',t:'Sicurezza: Tenderloin e zone attorno a Market St hanno seri problemi. Furti con rottura del vetro sono endemici — non lasciare MAI nulla nell\'auto, nemmeno un centesimo.'},
+    ],
+    hotel:{
+      bud:{n:'HI Hostel Fisherman\'s Wharf', p:'$60–90/persona', note:'Ostello di qualità in posizione straordinaria. Camere private disponibili. Per chi vuole massimizzare il budget.'},
+      mid:{n:'Hotel Triton Union Square', p:'$185–260/notte', note:'Boutique hotel eclettico nel cuore di SF, vicino a Union Square, cable car e Chinatown. L\'originale dell\'itinerario.'},
+      lux:{n:'The Marker San Francisco, a Joie de Vivre Hotel', p:'$235–395/notte', note:'Eleganza californiana a Union Square, ristorante Postino interno, bar raffinato, concierge eccellente.'},
+    }
+  },
+];
+
+const segs = [
+  {f:'Los Angeles',t:'San Diego',n:'2h 15m',r:'4–5h',k:'~200 km',v:'Via Pacific Coast Hwy, La Jolla'},
+  {f:'San Diego',t:'Palm Springs',n:'2h',r:'2h 30m–3h',k:'~190 km',v:'Via I-10 Est, Coachella Valley'},
+  {f:'Palm Springs',t:'Needles',n:'3h',r:'5–6h',k:'~270 km',v:'Via Twentynine Palms, Joshua Tree NP, I-40'},
+  {f:'Needles',t:'Grand Canyon',n:'3h 30m',r:'5–6h',k:'~290 km',v:'Via Oatman, Route 66, AZ-64 Sud'},
+  {f:'Grand Canyon',t:'Page',n:'2h 30m',r:'4h',k:'~195 km',v:'Via US-89 Nord, Cameron Trading Post'},
+  {f:'Page',t:'Moab',n:'3h 45m',r:'6–7h',k:'~350 km',v:'Via Antelope Canyon, US-163, Monument Valley, US-191'},
+  {f:'Moab',t:'Bryce Canyon',n:'4h',r:'6–7h',k:'~385 km',v:'Via Arches NP, UT-24, Red Canyon, UT-12'},
+  {f:'Bryce Canyon',t:'Zion',n:'1h 30m',r:'2h 30m',k:'~140 km',v:'Via UT-12, US-89, UT-9 (Zion-Mt Carmel Hwy)'},
+  {f:'Zion',t:'Las Vegas',n:'2h 15m',r:'4h',k:'~245 km',v:'Via Valley of Fire SP, I-15 Sud'},
+  {f:'Las Vegas',t:'Mammoth Lakes',n:'5h',r:'6–7h',k:'~480 km',v:'Via Death Valley NP, CA-136, US-395 Nord'},
+  {f:'Mammoth Lakes',t:'Yosemite/Merced',n:'4h',r:'6–7h',k:'~265 km',v:'Via Tioga Pass CA-120, Yosemite Valley, CA-140'},
+  {f:'Merced',t:'San Francisco',n:'1h 45m',r:'2h 30m',k:'~185 km',v:'Via CA-99, I-580, Bay Bridge'},
+];
+
+// ═══════════════════════════════
+// MAP
+// ═══════════════════════════════
+const map = L.map('map-el').setView([37.5,-113.0],6);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
+  attribution:'© OpenStreetMap © CARTO',maxZoom:19
+}).addTo(map);
+
+function mkIcon(n){
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="30" height="36" viewBox="0 0 30 36">
+    <path d="M15 0C6.716 0 0 6.716 0 15c0 11.25 15 21 15 21s15-9.75 15-21C30 6.716 23.284 0 15 0z" fill="#f0a030" stroke="rgba(0,0,0,.4)" stroke-width="1.2"/>
+    <text x="15" y="19.5" text-anchor="middle" fill="white" font-family="'Syne',sans-serif" font-weight="700" font-size="11">${n}</text>
+  </svg>`;
+  return L.divIcon({html:svg,className:'',iconSize:[30,36],iconAnchor:[15,36],tooltipAnchor:[0,-36]});
+}
+
+const ll=[];
+stops.forEach((s,i)=>{
+  const mk=L.marker(s.coords,{icon:mkIcon(s.n)}).addTo(map);
+  ll.push(s.coords);
+  const ps=s.hi.map(h=>`<span class="ct-pill">${h}</span>`).join('');
+  const dr=s.driveFrom?`<hr class="ct-sep"><div class="ct-drive">🚗 Da ${s.driveFrom}: <strong>${s.driveNet} netti</strong> · <strong style="color:#fb923c">${s.driveReal} reali</strong> · ${s.driveKm}</div>`:'';
+  mk.bindTooltip(`<div class="ct-tip"><div class="ct-day">${s.day}</div><div class="ct-name">${s.n}. ${s.title}</div><div class="ct-temp">🌡 ${s.temp}</div><div class="ct-pills">${ps}</div>${dr}</div>`,
+    {direction:'top',sticky:false,opacity:1,className:''});
+});
+
+for(let i=0;i<ll.length-1;i++){
+  const sg=segs[i];
+  const pl=L.polyline([ll[i],ll[i+1]],{color:'#f0a030',weight:2.5,dashArray:'8,7',opacity:.65}).addTo(map);
+  if(sg)pl.bindPopup(`<div class="dpop"><strong>${sg.f} → ${sg.t}</strong><br>⏱ Guida netta: <strong>${sg.n}</strong><br>🚗 Con soste reali: <strong style="color:#fb923c">${sg.r}</strong><br>📍 ${sg.k}<br><span style="font-size:11px;color:#4d6380">Via: ${sg.v}</span></div>`,{className:''});
+}
+map.fitBounds(L.latLngBounds(ll),{padding:[50,50]});
+
+// ═══════════════════════════════
+// RENDER TAPPE
+// ═══════════════════════════════
+const tout=document.getElementById('tappe-out');
+stops.forEach(s=>{
+  const tl=s.tips.map(t=>`<li><span class="tic">${t.i}</span>${t.t}</li>`).join('');
+  const pl=s.hi.map(h=>`<span class="pill">${h}</span>`).join('');
+  const dr=s.driveFrom?`<span class="b b-dr">🚗 ${s.driveReal} da ${s.driveFrom}</span>`:'<span class="b b-ok">✈️ Punto di partenza</span>';
+  tout.innerHTML+=`<div class="card"><div class="ca ca-g"></div>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.6rem;">
+    <div><span style="color:var(--gold);font-family:Syne,sans-serif;font-size:1.1rem;font-weight:800;">${s.n}.</span>
+      <span class="ct" style="margin-left:.35rem;">${s.title}</span></div>
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap;">${dr}<span class="b b-d">${s.day}</span><span class="b b-ok">🌡 ${s.temp}</span></div>
+  </div>
+  <div class="pills">${pl}</div>
+  <ul class="tl">${tl}</ul></div>`;
+});
+
+// ═══════════════════════════════
+// RENDER CONSIGLI GENERALI
+// ═══════════════════════════════
+document.getElementById('gen-out').innerHTML=`
+<div class="stat-row">
+  <div class="stat"><div class="sv">~€4.500</div><div class="sl">Budget / persona</div></div>
+  <div class="stat"><div class="sv">~3.900</div><div class="sl">Km percorsi totali</div></div>
+  <div class="stat"><div class="sv">~42h</div><div class="sl">Ore di guida stimate</div></div>
+  <div class="stat"><div class="sv">$250</div><div class="sl">Non-Resident Park Pass</div></div>
+</div>
+
+<div class="stitle">✈️ ESTA & Ingresso USA</div>
+<div class="ib w"><strong>Costo: $40/persona</strong> (portato da $21 nel 2025). Validità biennale. Richiedi SUBITO su <strong>esta.cbp.dhs.gov</strong> — il sito ufficiale del CBP, evita i portali intermediari a pagamento.<br><br>
+<strong>Novità 2026 in vigore o in arrivo:</strong> Il CBP ha introdotto l'obbligo di dichiarare tutti gli account social media degli ultimi 5 anni (Instagram, Facebook, X/Twitter, TikTok, LinkedIn, ecc.), numeri di telefono (5 anni), email (10 anni) e dati familiari. Prevista la migrazione su app ESTA Mobile. Dal 26 dicembre 2025: scansione facciale biometrica obbligatoria all'ingresso e uscita USA per tutti i non-cittadini.<br><br>
+<strong>Per italiani con doppia cittadinanza</strong> con Iran, Iraq, Siria, Sudan, Corea del Nord, o che abbiano visitato questi paesi dal 2011: l'ESTA non è utilizzabile, serve il visto.</div>
+
+<div class="stitle">🚗 Noleggio Auto</div>
+<div class="ib s"><strong>Veicolo ideale per 4 persone:</strong> SUV intermedio (Toyota RAV4, Chevy Equinox, Ford Edge, Hyundai Santa Fe). Altezza da terra sufficiente per Valley Drive a Monument Valley e comfort su 16 giorni di guida.</div>
+<div class="ib"><strong>Dove prenotare:</strong> <strong>AutoEurope</strong> (autoeurope.it) è la scelta migliore per gli italiani — interfaccia in italiano, CDW/LDW inclusa, pacchetto "Senza Franchigia", assistenza telefonica in italiano. Alternative: DiscoverCars.com, Rentalcars.com per confronto prezzi.<br><br>
+<strong>One-way LAX → SFO:</strong> Sixt non applica supplementi one-way in California — vantaggio significativo rispetto ad altri operatori che possono aggiungere $200-700.<br><br>
+<strong>Costo stimato 16 giorni:</strong> $1.200–2.200 tutto incluso (SUV, assicurazioni, tasse).<br><br>
+<strong>Carta di credito obbligatoria:</strong> Intestata al guidatore principale, non prepagata, non di debito. Plafond disponibile minimo €1.500-2.000 per il deposito cauzionale.</div>
+
+<div class="stitle">🛡️ Assicurazione Auto — Il Punto Più Critico</div>
+<div class="ib d"><strong>⚠️ La responsabilità civile base è pericolosamente insufficiente.</strong> In California il minimo legale è $15.000 per danni a persona. In un paese dove le cause per incidenti raggiungono milioni di dollari, questa copertura è del tutto inadeguata.<br><br>
+<strong>Acquista SEMPRE:</strong><ul>
+<li>✅ <strong>SLI/ALI</strong> (Supplemental Liability Insurance): massimale minimo $1.000.000</li>
+<li>✅ <strong>CDW/LDW</strong> senza franchigia: copre i danni al veicolo noleggiato</li>
+<li>⚠️ La CDW spesso esclude vetri, pneumatici e sottoscocca — verifica la polizza</li>
+<li>⚠️ Le carte di credito italiane NON offrono coperture equivalenti a quelle USA</li>
+</ul><br>
+<strong>Strategia:</strong> Prenota via AutoEurope con tariffa "Senza Franchigia" già inclusa + SLI. Al banco di ritiro, rifiuta TUTTE le assicurazioni aggiuntive proposte dagli addetti (sono venditori a provvigione).</div>
+
+<div class="stitle">📄 Patente Internazionale</div>
+<div class="ib w"><strong>⚠️ L'Arizona richiede IDP o traduzione certificata</strong> — e voi lo attraversate. La patente italiana da sola non basta. Modello richiesto: <strong>Convenzione di Ginevra 1949</strong>, validità 1 anno.<br><br>
+• <strong>ACI</strong> (~€76): sportello con modulo TT746, 2 fototessere (1 autenticata), fotocopia patente e documento. Più rapido e comodo.<br>
+• <strong>Motorizzazione Civile</strong> (€42,20): tempi 15-20 giorni lavorativi.<br><br>
+Richiedila ora — con partenza il 1° ottobre hai tutto il tempo.</div>
+
+<div class="stitle">⛽ Carburante & Prezzi</div>
+<div class="ib"><strong>Prezzi stimati ottobre 2026</strong> (influenzati dalla crisi del cherosene che impatta anche i derivati petroliferi):<br>
+• <strong>California:</strong> $5,50–6,00/gallone (≈€1,45–1,55/litro) — la più cara degli USA<br>
+• <strong>Nevada:</strong> $4,50–5,00/gallone<br>
+• <strong>Arizona:</strong> $3,80–4,30/gallone<br>
+• <strong>Utah:</strong> $3,60–4,10/gallone<br><br>
+<strong>Budget carburante totale stimato:</strong> $450–700 per l'intero itinerario con SUV (25-28 MPG).<br><br>
+Usa sempre <strong>Regular Unleaded (87 ottani)</strong> salvo indicazione contraria. App <strong>GasBuddy</strong> per trovare le stazioni più economiche in tempo reale. In California puoi risparmiare $0,30-0,60/gallone scegliendo le stazioni giuste.</div>
+
+<div class="stitle">🏞️ Parchi Nazionali — Non-Resident Pass OBBLIGATORIO</div>
+<div class="ib d"><strong>🔴 Dal 1° gennaio 2026: $100 a persona per non-residenti USA</strong> in 11 parchi, inclusi Grand Canyon, Yosemite, Bryce Canyon e Zion. Per 4 persone in 4 parchi = <strong>$1.600 solo di sovrattasse</strong>, più i biglietti standard ($30-35/veicolo).<br><br>
+<strong>SOLUZIONE: Non-Resident Annual Pass a $250 — un solo pass per tutto il gruppo.</strong><br>
+Copre il titolare + tutti i passeggeri del veicolo privato in tutti i parchi federali per 12 mesi.<br>
+Acquista su <strong>store.usgs.gov</strong> (versione digitale usabile da smartphone) o <strong>recreation.gov</strong>.<br>
+<strong>Risparmio calcolato: oltre $1.350 rispetto ai biglietti singoli.</strong></div>
+
+<div class="stitle">🛣️ Pedaggi & FasTrak</div>
+<div class="ib">In California i pedaggi sono tutti elettronici (niente caselli fisici con personale): sistema <strong>FasTrak</strong>. La compagnia di noleggio rileva i transiti e addebita pedaggi + supplemento giornaliero ($3,95–4,95 nei giorni con transiti). <strong>Golden Gate Bridge:</strong> $9,75 solo in direzione sud (Marin → San Francisco non ha pedaggi). Arizona, Utah e Nevada: nessun pedaggio significativo sul vostro percorso.</div>
+
+<div class="stitle">📱 App Indispensabili da Scaricare Prima</div>
+<div class="ib"><strong>Scarica offline PRIMA di imbarcarti:</strong><ul>
+<li>📍 <strong>Google Maps</strong>: scarica le mappe offline di CA, NV, AZ, UT. Fondamentale in Death Valley, Monument Valley, Utah rurale (zero segnale)</li>
+<li>⛽ <strong>GasBuddy</strong>: prezzi carburante in tempo reale lungo il percorso</li>
+<li>🏕 <strong>Recreation.gov</strong>: prenotazioni parchi, Angels Landing, camping</li>
+<li>🚦 <strong>Waze</strong>: traffico in tempo reale (ottimo in CA e NV)</li>
+<li>🗺 <strong>iOverlander</strong>: punti di interesse off-road, servizi in zone remote</li>
+<li>🎟 <strong>Viator</strong>: tour guidati (Antelope Canyon, Monument Valley, kayak)</li>
+</ul></div>
+
+<div class="stitle">🕐 Fusi Orari — Attenzione alla Nazione Navajo</div>
+<div class="ib w"><strong>In ottobre (prima del 1° novembre, ora legale USA ancora attiva):</strong><br>
+• <strong>California, Nevada (PDT = UTC-7):</strong> LA, San Diego, Palm Springs, Joshua Tree, Death Valley, Mammoth, Yosemite, SF<br>
+• <strong>Arizona (MST = UTC-7, NO ora legale):</strong> Grand Canyon South Rim, Page, Oatman — in ottobre stessa ora di CA/NV per coincidenza<br>
+• <strong>Utah (MDT = UTC-6):</strong> Moab, Arches, Bryce Canyon, Zion — 1 ORA AVANTI rispetto a CA/NV<br>
+• <strong>Nazione Navajo (MDT = UTC-6):</strong> Antelope Canyon, Monument Valley — segue Utah, 1 ora avanti rispetto all'AZ circostante<br><br>
+Il GPS del telefono corregge automaticamente. Attenzione alle prenotazioni di tour Navajo: gli orari sono spesso espressi in ora locale Navajo.</div>
+
+<div class="stitle">💰 Mance & Pagamenti</div>
+<div class="ib"><strong>Mance (gratuità):</strong> 18-22% nei ristoranti, 15% in bar e caffè, $2-3 per corsa Uber/taxi, $5-10/giorno ai facchini d'hotel. Non è opzionale nel sistema americano.<br><br>
+<strong>Pagamenti:</strong> Visa/Mastercard accettate ovunque. <strong>Avvisa la tua banca prima di partire</strong> per evitare blocchi antifrode. Porta sempre $150-200 in contanti per emergenze in zone remote (Navajo Nation, Death Valley).</div>
+
+<div class="stitle">🚦 Regole della Strada USA</div>
+<div class="ib"><ul>
+<li>🟢 <strong>Svolta a destra col rosso:</strong> legale quasi ovunque — ma fermati completamente prima</li>
+<li>🟡 <strong>4-way stop:</strong> chi arriva primo passa primo; in caso di pareggio, chi è a destra ha la precedenza</li>
+<li>🔴 <strong>School bus con luci rosse lampeggianti:</strong> fermati in ENTRAMBE le direzioni — multa salatissima</li>
+<li>♦ <strong>HOV lanes:</strong> con 4 occupanti potete usare le corsie preferenziali in California</li>
+<li>⚡ <strong>Limiti di velocità:</strong> rispettali scrupolosamente — piccoli centri in AZ e UT usano autovelox per fare cassa</li>
+<li>🦌 <strong>Fauna in strada:</strong> mule deer, bighorn sheep, coyote specialmente al crepuscolo. Riduci la velocità di notte</li>
+</ul></div>`;
+
+// ═══════════════════════════════
+// RENDER ALLOGGI
+// ═══════════════════════════════
+const aout=document.getElementById('alloggi-out');
+aout.innerHTML=`<div class="ib s" style="margin-bottom:1.5rem;"><strong>💡 Budget alloggi stimato per 4 persone:</strong> Con mix economico-mid range, stimate €100-150/persona/notte (due camere doppie a €130-200/notte l'una). <strong>Prenotate subito</strong> gli hotel dentro i parchi nazionali (Yavapai Lodge, Bryce Canyon Lodge, Zion Lodge, El Tovar): si esauriscono con 6-13 mesi di anticipo su recreation.gov.</div>`;
+stops.forEach(s=>{
+  const h=s.hotel;
+  aout.innerHTML+=`<div class="card" style="margin-bottom:.75rem;"><div class="ca ca-c"></div>
+  <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem;flex-wrap:wrap;">
+    <div class="ct">${s.n}. ${s.title}</div>
+    <span class="b b-d">${s.day}</span>
+  </div>
+  <div class="htier"><div class="htl b2">BUDGET</div><div><div class="hn">${h.bud.n}</div><div class="hp">${h.bud.p} per camera</div><div class="hnote">${h.bud.note}</div></div></div>
+  <div class="htier"><div class="htl m2">MID</div><div><div class="hn">${h.mid.n}</div><div class="hp">${h.mid.p} per camera</div><div class="hnote">${h.mid.note}</div></div></div>
+  <div class="htier"><div class="htl lu">UPGRADE</div><div><div class="hn">${h.lux.n}</div><div class="hp">${h.lux.p} per camera</div><div class="hnote">${h.lux.note}</div></div></div>
+  </div>`;
+});
+
+// ═══════════════════════════════
+// RENDER GEOPOLITICA
+// ═══════════════════════════════
+document.getElementById('geo-out').innerHTML=`
+<div class="ib d"><strong>⚠️ Situazione in rapida evoluzione — aggiornata al 5 aprile 2026.</strong> La crisi del cherosene è reale e documentata. Il volo Lufthansa MXP→LAX è a rischio nel breve termine (estate 2026) ma probabilmente stabile per ottobre se il conflitto in Iran non si aggrava ulteriormente. Monitor attivo consigliato.</div>
+
+<div class="stitle">✈️ Crisi del Cherosene: Situazione Reale</div>
+<div class="ib d"><strong>Cosa è successo:</strong> La guerra in Iran (febbraio 2026) ha portato alla chiusura dello Stretto di Hormuz. L'ultimo tanker di jet fuel dal Golfo arriverà a Rotterdam il 9 aprile 2026 — poi nessuna spedizione prevista dalla regione. Le importazioni europee sono crollate del 40%. Il prezzo del jet fuel è raddoppiato da ~$750 a $1.500-1.800/tonnellata. Il Brent crude è a $109-111/barile.</div>
+<div class="ib w"><strong>Lufthansa specificamente (dati al 5/4/2026):</strong><br>
+• ~80% del carburante coperto da hedging a prezzi pre-crisi fino a fine 2026<br>
+• Prepara il ritiro di 40 aerei inefficienti (5% flotta), priorità su A340<br>
+• Morgan Stanley ha declassato il titolo: costi aggiuntivi stimati ~€1,5 miliardi nel 2026<br>
+• Rotte USA, le più redditizie, sono le ULTIME ad essere tagliate<br><br>
+<strong>Per il vostro volo MXP→LAX:</strong> Nessuna cancellazione specifica al 5 aprile. Lufthansa opera MXP→LAX via Francoforte/Monaco con circa 17 voli settimanali. Il periodo critico (maggio-luglio) sarà già passato per ottobre.<br><br>
+<strong>Cosa fare ORA:</strong><ul>
+<li>✅ Iscriviti agli alert email Lufthansa per il tuo volo</li>
+<li>✅ Stipula assicurazione con copertura cancellazione volo/interruzione viaggio</li>
+<li>✅ Considera N26 Metal, Amex o Revolut Metal per protezione viaggio integrata sulla carta</li>
+<li>✅ Backup alternatives per ottobre: SWISS via Zurigo, Air France via Parigi, American Airlines diretto MXP-USA</li>
+</ul></div>
+
+<div class="stitle">📋 ESTA 2026: Le Nuove Regole</div>
+<div class="ib w"><strong>Aggiornamenti in vigore o in implementazione:</strong><br>
+• <strong>Costo: $40/persona</strong> (era $21) — validità 2 anni<br>
+• <strong>Social media (proposta CBP dicembre 2025):</strong> Dichiarazione obbligatoria di tutti gli account degli ultimi 5 anni: Instagram, Facebook, X, TikTok, YouTube, LinkedIn, Snapchat, ecc.<br>
+• <strong>Dati estesi:</strong> Numeri di telefono (5 anni), indirizzi email (10 anni), dati familiari<br>
+• <strong>Biometria:</strong> Dal 26/12/2025 scansione facciale obbligatoria all'ingresso e uscita USA per tutti i non-cittadini<br>
+• <strong>Selfie obbligatorio</strong> oltre alla foto del passaporto<br><br>
+<strong>L'Italia NON è nel travel ban.</strong> Se hai doppia cittadinanza con Iran, Iraq, Siria, Sudan, Corea del Nord o hai visitato questi paesi dal 2011: l'ESTA non è utilizzabile, serve un visto. Rivolgiti al Consolato USA a Milano.</div>
+
+<div class="stitle">🇮🇹 Relazioni Italia-USA: Tensioni ma Nessun Impatto su di Voi</div>
+<div class="ib"><strong>Il quadro commerciale:</strong> Dazio universale del 15% sui prodotti europei (febbraio 2026). L'UE ha sospeso la ratifica dell'accordo commerciale e valuta contromisure. L'Italia ha un surplus commerciale di €40 miliardi con gli USA — il più grande con qualunque Paese — trainato da vino, alimentari e moda.<br><br>
+<strong>L'Italia come mediatrice:</strong> Meloni si è posizionata come ponte Trump-UE. L'incidente di Sigonella (aprile 2026, Italia nega atterraggio a bombardieri USA) è una frizione ma non tocca il piano consolare o turistico.<br><br>
+<strong>Per voi praticamente:</strong> Nessun effetto. Gli americani amano gli italiani. Aspettatevi curiosità e calore, non ostilità.</div>
+
+<div class="stitle">🏞️ La Stangata dei Parchi Nazionali</div>
+<div class="ib d"><strong>In vigore dal 1° gennaio 2026:</strong> $100/persona aggiuntivi per i non-residenti USA in 11 parchi nazionali tra cui Grand Canyon, Yosemite, Bryce Canyon e Zion. Per 4 persone in 4 parchi: <strong>$1.600 di sole sovrattasse</strong>.<br><br>
+<strong>SOLUZIONE:</strong> Non-Resident Annual Pass a <strong>$250 per tutto il gruppo.</strong> Risparmio: >$1.350. Acquista su store.usgs.gov prima di partire. La versione digitale funziona da smartphone — nessuna spedizione necessaria.</div>
+
+<div class="stitle">🔒 Sicurezza sul Percorso</div>
+<div class="ib"><strong>San Francisco 🟡</strong> — Furti con rottura del vetro endemici (Tenderloin, SoMa, Mission). Non lasciare MAI nulla in vista nell'auto — nemmeno un cavo di ricarica. Tenderloin e zone attorno a Market St: evita di sera.<br><br>
+<strong>Los Angeles 🟡</strong> — Traffico pericoloso in autostrada, specie di notte. Venice Beach di sera richiede attenzione. Non fermarti in zone industriali isolate.<br><br>
+<strong>Las Vegas 🟢</strong> — La Strip è ben sorvegliata, sicura per i turisti. Attenzione nelle zone fuori dalla Strip turistica.<br><br>
+<strong>Parchi e deserto 🟢/🟡</strong> — Rischi principalmente ambientali: caldo estremo in Death Valley, caduta rocce, iponatremia (bevi anche se non hai sete). Porta sempre acqua extra, kit di pronto soccorso e powerbank. Mappe offline obbligatorie.<br><br>
+<strong>Registra il viaggio:</strong> Iscriviti su <strong>dovesiamonelmondo.it</strong> (Farnesina) e scarica l'app <strong>"Viaggiare Sicuri"</strong> per aggiornamenti in tempo reale e contatti consolari.</div>
+
+<div class="stitle">🏥 Assicurazione Sanitaria — Non È Opzionale</div>
+<div class="ib d"><strong>Gli USA non hanno accordi sanitari con l'Italia.</strong> Il SSN non copre nulla in America. Costi reali del sistema sanitario privato USA:<br>
+• Visita pronto soccorso: da $1.000<br>
+• Ricovero per notte: $3.000–10.000<br>
+• Appendicectomia: $25.000+<br>
+• Incidente grave con ricovero: $100.000+<br><br>
+<strong>Copertura minima raccomandata: €300.000</strong> — meglio €1.000.000 o illimitata.<br>
+<strong>Costo:</strong> €33–61/settimana a persona (€4–9/giorno) — il costo assicurativo più ovvio di tutto il viaggio.<br><br>
+<strong>Opzioni consigliate:</strong> <strong>Heymondo Premium</strong> (medico illimitato, assistenza 24/7 in italiano), <strong>Allianz Travel Care Extended</strong> (fino a €3M). Verifica che includa: rimpatrio sanitario, responsabilità civile verso terzi, annullamento viaggio, protezione bagaglio.</div>
+
+<div class="stitle">📞 Numeri Utili</div>
+<div class="ib"><strong>Emergenze USA:</strong> 911 (polizia, ambulanza, vigili del fuoco)<br>
+<strong>Consolato Italiano Los Angeles:</strong> +1 310 820 0622<br>
+<strong>Consolato Italiano San Francisco:</strong> +1 415 292 9210<br>
+<strong>Consolato Italiano Las Vegas:</strong> +1 702 678 9100<br>
+<strong>Farnesina Emergenze 24/7:</strong> +39 06 3691 5<br>
+<strong>Lufthansa Italia (emergenze volo):</strong> 02 58584848</div>`;
+
+// ═══════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════
+document.querySelectorAll('.tb').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const id=b.dataset.p;
+    document.querySelectorAll('.tb').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.pg').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById('pg-'+id).classList.add('on');
+    if(id==='map')setTimeout(()=>map.invalidateSize(),60);
+  });
+});
+}); // end window.load
+</script>
+</body>
+</html>
