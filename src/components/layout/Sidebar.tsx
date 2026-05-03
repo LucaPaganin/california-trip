@@ -9,6 +9,7 @@ const navItems = [
   { href: '/tappe',       icon: '📅', label: 'Tappe' },
   { href: '/consigli',    icon: '🧭', label: 'Consigli' },
   { href: '/alloggi',     icon: '🏨', label: 'Alloggi' },
+  { href: '/noleggio',    icon: '🚗', label: 'Noleggio SUV' },
   { href: '/geopolitica', icon: '🌐', label: 'Geopolitica' },
 ];
 
