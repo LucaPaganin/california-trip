@@ -1,0 +1,113 @@
+.sidebar {
+  width: var(--sw);
+  flex-shrink: 0;
+  background: var(--sb);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 200;
+  height: 100vh;
+}
+
+.brand {
+  padding: 1.4rem 1.2rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.flag  { font-size: 1.8rem; line-height: 1; }
+.title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.15;
+  margin-top: .3rem;
+}
+.sub {
+  font-size: .65rem;
+  color: var(--muted);
+  margin-top: .2rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  padding: .6rem 0;
+  gap: .15rem;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  padding: .65rem 1.2rem;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .82rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all .15s;
+  position: relative;
+}
+.link:hover { color: var(--text); background: rgba(255,255,255,.03); }
+
+.active { color: var(--gold) !important; background: rgba(240,160,48,.07) !important; }
+.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--gold);
+}
+
+.icon { font-size: 1rem; flex-shrink: 0; }
+
+.footer {
+  margin-top: auto;
+  padding: 1rem 1.2rem;
+  border-top: 1px solid var(--border);
+  font-size: .65rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ── MOBILE ── */
+@media (max-width: 700px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .brand {
+    padding: .6rem 1rem;
+    border-bottom: none;
+    flex-shrink: 0;
+  }
+  .title { font-size: .82rem; }
+  .sub   { display: none; }
+  .nav {
+    flex-direction: row;
+    padding: 0;
+    flex: 1;
+    overflow-x: auto;
+    gap: 0;
+  }
+  .link {
+    padding: .75rem .65rem;
+    font-size: .72rem;
+    white-space: nowrap;
+  }
+  .active::before {
+    top: auto; bottom: 0; left: 0; right: 0;
+    height: 2px; width: auto;
+  }
+  .footer { display: none; }
+}
