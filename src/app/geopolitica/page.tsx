@@ -1,9 +1,11 @@
 import InfoBox from '@/components/ui/InfoBox';
 import SectionTitle from '@/components/ui/SectionTitle';
+import PageTransition from '@/components/ui/PageTransition';
 
 export default function GeopoliticaPage() {
   return (
     <div className="page-scroll">
+      <PageTransition>
       <div className="pi">
         <div className="ph">
           <div className="ph-ey">Situazione attuale · Aprile 2026</div>
@@ -90,6 +92,7 @@ export default function GeopoliticaPage() {
           <strong>Lufthansa Italia (emergenze volo):</strong> 02 58584848
         </InfoBox>
       </div>
+      </PageTransition>
     </div>
   );
 }

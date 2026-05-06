@@ -1,10 +1,12 @@
 import { stops } from '@/data/stops';
 import HotelCard from '@/components/hotels/HotelCard';
 import InfoBox from '@/components/ui/InfoBox';
+import PageTransition from '@/components/ui/PageTransition';
 
 export default function AlloggiPage() {
   return (
     <div className="page-scroll">
+      <PageTransition>
       <div className="pi">
         <div className="ph">
           <div className="ph-ey">Dove dormire</div>
@@ -21,6 +23,7 @@ export default function AlloggiPage() {
           <HotelCard key={stop.n} stop={stop} />
         ))}
       </div>
+      </PageTransition>
     </div>
   );
 }

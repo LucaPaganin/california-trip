@@ -1,6 +1,7 @@
 import InfoBox from '@/components/ui/InfoBox';
 import SectionTitle from '@/components/ui/SectionTitle';
 import StatRow from '@/components/ui/StatRow';
+import PageTransition from '@/components/ui/PageTransition';
 
 const tripStats = [
   { value: '~€4.500', label: 'Budget / persona' },
@@ -12,6 +13,7 @@ const tripStats = [
 export default function ConsiglioPage() {
   return (
     <div className="page-scroll">
+      <PageTransition>
       <div className="pi">
         <div className="ph">
           <div className="ph-ey">Logistica &amp; Pratiche</div>
@@ -126,6 +128,7 @@ export default function ConsiglioPage() {
           </ul>
         </InfoBox>
       </div>
+      </PageTransition>
     </div>
   );
 }

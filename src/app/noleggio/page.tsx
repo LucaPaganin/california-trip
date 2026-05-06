@@ -1,6 +1,7 @@
 import InfoBox from '@/components/ui/InfoBox';
 import SectionTitle from '@/components/ui/SectionTitle';
 import StatRow from '@/components/ui/StatRow';
+import PageTransition from '@/components/ui/PageTransition';
 
 const stats = [
   { value: '$906',  label: 'Miglior prezzo SUV 15gg (SIXT)' },
@@ -95,6 +96,7 @@ const suvsDesert = [
 export default function NoleggioPage() {
   return (
     <div className="page-scroll">
+      <PageTransition>
       <div className="pi">
         <div className="ph">
           <div className="ph-ey">Logistica · Trasporti</div>
@@ -320,6 +322,7 @@ export default function NoleggioPage() {
           Prezzi rilevati aprile 2026 — Indicativi, soggetti a variazione. Verificare la quotazione definitiva al momento della prenotazione.
         </div>
       </div>
+      </PageTransition>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Sidebar from '@/components/layout/Sidebar';
+import SmoothScroll from '@/components/layout/SmoothScroll';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -12,6 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="it">
       <body>
         <Sidebar />
+        <SmoothScroll />
         <main id="main">{children}</main>
       </body>
     </html>
